@@ -13,5 +13,13 @@ namespace Lupa.Diagnostics
         public DiagnosticKind Kind { get; }
         public string Message { get; }
         public TokenPosition Position { get; }
+
+        public void Debug() {
+            Console.WriteLine(ToString());
+        }
+        public override string ToString()
+        {
+            return $"[{Position.Line}:{Position.Column}] {Message}";
+        }
     }
 }

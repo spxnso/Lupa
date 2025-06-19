@@ -10,5 +10,15 @@ namespace Lupa.Lexing {
         public TokenKind Kind { get; }
         public string Lexeme { get; }
         public TokenPosition Position { get; }
+
+        public void Debug()
+        {
+            Console.WriteLine(this.ToString());
+        }
+
+        public override string ToString()
+        {
+            return $"[{Position.Line}:{Position.Column}] {Kind} → '{Lexeme}'";
+        }
     }
 }
