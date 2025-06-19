@@ -6,9 +6,10 @@ namespace Lupa.Lexing
     public class Lexer
     {
         private readonly string _input;
+        private List<Token> _tokens = new List<Token>();
         private List<Diagnostic> _diagnostics = new List<Diagnostic>();
         private TokenPosition _position = new TokenPosition(1, 1, 0);
-
+        
         public Lexer(string input)
         {
             _input = input;
@@ -118,5 +119,18 @@ namespace Lupa.Lexing
                     return Error(DiagnosticKind.UnexpectedCharacter, $"Unexpected character '{Current}'", Current.ToString(), tokenPosition);
             }
         }
+        
+
+        public IEnumerable<Token> Lex() {
+            while (!AtEof()) {
+                Token token = ReadNext(); 
+                _tokens.Add(token);
+            }
+
+            return Tokens;
+        }
+
+        public IEnumerable<Diagnostic> Diagnostics => _diagnostics;
+        public IEnumerable<Token> Tokens => _tokens;
     }
 }
