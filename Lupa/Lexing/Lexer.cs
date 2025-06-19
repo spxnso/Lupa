@@ -116,7 +116,7 @@ namespace Lupa.Lexing
                 case '^':
                     return new Token(TokenKind.Caret, Advance().ToString(), tokenPosition);
                 default:
-                    return Error(DiagnosticKind.UnexpectedCharacter, $"Unexpected character '{Current}'", Current.ToString(), tokenPosition);
+                    return Error(DiagnosticKind.UnexpectedCharacter, $"Unexpected character '{Current}'", Advance().ToString(), tokenPosition);
             }
         }
         
