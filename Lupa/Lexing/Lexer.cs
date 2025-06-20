@@ -126,7 +126,8 @@ namespace Lupa.Lexing
                 Token token = ReadNext(); 
                 _tokens.Add(token);
             }
-
+            
+            _tokens.Add(new Token(TokenKind.Eof, String.Empty, _position));
             return Tokens;
         }
 

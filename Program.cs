@@ -1,4 +1,5 @@
 ﻿using Lupa.Lexing;
+using Lupa.Parsing;
 
 public class Program {
     public static void Main(string[] args) {
@@ -17,17 +18,27 @@ public class Program {
             foreach (var token in tokens) {
                 token.Debug();
             }
-            Console.ForegroundColor = ConsoleColor.White;
+
+
+
 
 
             Console.WriteLine();
-            if (lexer.Diagnostics.Any()) {
+
+            var parser = new Parser(tokens, lexer.Diagnostics);
+            var syntaxTree = parser.Parse();
+
+            syntaxTree.Debug();
+            
+            if (parser.Diagnostics.Any()) {
                 Console.ForegroundColor = ConsoleColor.Red;
-                foreach (var diagnostic in lexer.Diagnostics) {
+                foreach (var diagnostic in parser.Diagnostics) {
                     diagnostic.Debug();
                 }
-                Console.ForegroundColor = ConsoleColor.White;
+                
+               
             }
+            Console.ForegroundColor = ConsoleColor.White;
         }
     }
 }

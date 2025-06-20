@@ -13,5 +13,10 @@ namespace Lupa.Lexing
             Column = column;
             Offset = index;
         }
+
+        public override string ToString()
+        {
+            return $"[{Line}:{Column}]";
+        }
     }
 }
