@@ -13,5 +13,7 @@ namespace Lupa.Binding
         LogicalOr,
         Equals,
         NotEquals,
+        GreaterThan,
+        LessThan,
     }
 }

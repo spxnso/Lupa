@@ -35,8 +35,10 @@ namespace Lupa.Binding
             new BoundBinaryOperator(TokenKind.SlashSlash, BoundBinaryOperatorKind.FloorDivision, typeof(double)),
             new BoundBinaryOperator(TokenKind.Percent, BoundBinaryOperatorKind.Modulus, typeof(double)),
             new BoundBinaryOperator(TokenKind.Caret, BoundBinaryOperatorKind.Pow, typeof(double)),
-            new BoundBinaryOperator(TokenKind.EqualEquals, BoundBinaryOperatorKind.Equals, typeof(double)),
-            new BoundBinaryOperator(TokenKind.NotEquals, BoundBinaryOperatorKind.NotEquals, typeof(double)),
+            new BoundBinaryOperator(TokenKind.GreaterThan, BoundBinaryOperatorKind.GreaterThan, typeof(double), typeof(double), typeof(bool)),
+            new BoundBinaryOperator(TokenKind.LessThan, BoundBinaryOperatorKind.LessThan, typeof(double), typeof(double), typeof(bool)),
+            new BoundBinaryOperator(TokenKind.EqualEquals, BoundBinaryOperatorKind.Equals, typeof(double), typeof(double), typeof(bool)),
+            new BoundBinaryOperator(TokenKind.NotEquals, BoundBinaryOperatorKind.NotEquals, typeof(double), typeof(double), typeof(bool)),
 
 
             // Bools

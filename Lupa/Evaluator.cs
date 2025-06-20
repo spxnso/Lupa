@@ -1,9 +1,9 @@
-using Lupa.AST;
 using Lupa.Binding;
 using Lupa.Lexing;
 
 namespace Lupa
 {
+
     internal class Evaluator
     {
         private readonly BoundExpression _root;
@@ -23,17 +23,17 @@ namespace Lupa
             {
                 return n.Value;
             }
-            // if (expression is UnaryExpression u)
-            // {
-            //     var operand = EvaluateExpression(u.Operand);
-            //     switch (u.OperatorToken.Kind)
-            //     {
-            //         case TokenKind.Minus:
-            //             return -(double)operand;
-            //         case TokenKind.Not:
-            //             return !(bool)operand;
-            //     }
-            // }
+            if (expression is BoundUnaryExpression u)
+            {
+                var operand = EvaluateExpression(u.Operand);
+                switch (u.Operator.Kind)
+                {
+                    case BoundUnaryOperatorKind.Negative:
+                        return -(double)operand;
+                    case BoundUnaryOperatorKind.LogicalNegation:
+                        return !(bool)operand;
+                }
+            }
 
             if (expression is BoundBinaryExpression b)
             {
@@ -64,7 +64,10 @@ namespace Lupa
                         return Equals(left, right);
                     case BoundBinaryOperatorKind.NotEquals:
                         return !Equals(left, right);
-
+                    case BoundBinaryOperatorKind.GreaterThan:
+                        return (double)left > (double)right;
+                    case BoundBinaryOperatorKind.LessThan:
+                        return (double)left < (double)right;
                     default:
                         throw new Exception($"Unexpected binary operator {b.Operator.Kind}");
                 }

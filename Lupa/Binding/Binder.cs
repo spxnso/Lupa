@@ -25,7 +25,19 @@ namespace Lupa.Binding
 
         private BoundExpression BindUnaryExpression(UnaryExpression expr)
         {
-            throw new NotImplementedException();
+            var boundOperand = BindExpression(expr.Operand);
+            var boundOperator = BoundUnaryOperator.Bind(expr.OperatorToken.Kind, boundOperand.Type);
+
+            if (boundOperator == null) {
+                _diagnostics.Add(new Diagnostic(
+                    DiagnosticKind.TypeError,
+                    $"Operator '{expr.OperatorToken.Lexeme}' cannot be applied to operand of type '{boundOperand.Type}'",
+                    expr.OperatorToken.Position
+                ));
+
+                return boundOperand;
+            }
+            return new BoundUnaryExpression(boundOperator, boundOperand);
         }
 
         private BoundExpression BindBinaryExpression(BinaryExpression expr)
