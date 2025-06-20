@@ -167,6 +167,10 @@ namespace Lupa.Lexing
                     return new Token(TokenKind.Dot, Advance().ToString(), tokenPosition);
                 case '#':
                     return new Token(TokenKind.Hash, Advance().ToString(), tokenPosition);
+                case '(':
+                    return new Token(TokenKind.LeftParen, Advance().ToString(), tokenPosition);
+                case ')':
+                    return new Token(TokenKind.RightParen, Advance().ToString(), tokenPosition);
                 default:
 
                     return Error(DiagnosticKind.UnexpectedCharacter, $"Unexpected character '{Current}'", Advance().ToString(), tokenPosition);

@@ -79,10 +79,18 @@ namespace Lupa.Parsing
 
         private Expression ParsePrimaryExpression() {
             switch (Current.Kind) {
+                case TokenKind.LeftParen:
+                    var leftParenToken = Advance();
+                    var expression = ParseExpression();
+                    var rightParenToken = Match(TokenKind.RightParen);
+
+                    return new ParenthizedExpression(leftParenToken, expression, rightParenToken);
+                case TokenKind.Boolean:
+                    var booleanToken = Advance();
+                    return new LiteralExpression(booleanToken, booleanToken.Lexeme == "true");
                 case TokenKind.Number:
                     var literalToken = Advance();
-
-                    return new LiteralExpression(literalToken, int.Parse(literalToken.Lexeme));
+                    return new LiteralExpression(literalToken, literalToken.TryParseLuauNumber(out var value) ? value : 0);
                 default:
                     _diagnostics.Add(new Diagnostic(DiagnosticKind.UnexpectedToken, $"Unexpected token {Current.Kind} at position {Current.Position}.", Current.Position));
                     throw new Exception($"Unexpected token {Current.Kind} at position {Current.Position}.");

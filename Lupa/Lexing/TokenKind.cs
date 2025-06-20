@@ -11,9 +11,13 @@ namespace Lupa.Lexing
         Name,
         Reserved,
         
+        // Symbols
         Equals,
         Dot,
 
+        LeftParen,
+        RightParen,
+        
         // Binary Operators
         Plus,
         Minus,

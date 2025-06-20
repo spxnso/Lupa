@@ -22,7 +22,7 @@ namespace Lupa.AST
         public void Debug()
         {
             var color = Console.ForegroundColor;
-            var tree = new Tree(Root.Kind.ToString());
+            var tree = new Tree("Root");
 
             Build(Root, tree);
 
@@ -31,11 +31,13 @@ namespace Lupa.AST
 
             Console.WriteLine();
 
-            if (Diagnostics.Any()) {
+            if (Diagnostics.Any())
+            {
                 Console.ForegroundColor = ConsoleColor.Red;
-                foreach (var diagnostic in Diagnostics) {
+                foreach (var diagnostic in Diagnostics)
+                {
                     diagnostic.Debug();
-                }  
+                }
             }
 
             Console.ForegroundColor = color;
@@ -46,24 +48,35 @@ namespace Lupa.AST
             switch (node)
             {
                 case LiteralExpression literalExpr:
-                    parent.AddNode($"Value: {literalExpr.LiteralToken.Lexeme}");
-                    parent.AddNode($"Kind: {literalExpr.LiteralToken.Kind}");
+                    var literalNode = parent.AddNode("LiteralExpression");
+                    literalNode.AddNode($"Value: {literalExpr.Value}");
+                    literalNode.AddNode($"Kind: {literalExpr.LiteralToken.Kind}");
                     break;
 
                 case BinaryExpression binExpr:
-                    parent.AddNode($"Operator: {binExpr.OperatorToken.Lexeme}");
-
-                    var leftNode = parent.AddNode("Left");
+                    var binNode = parent.AddNode("BinaryExpression");
+                    binNode.AddNode($"Operator: {binExpr.OperatorToken.Lexeme}");
+                    var leftNode = binNode.AddNode("Left");
                     Build(binExpr.Left, leftNode);
-
-                    var rightNode = parent.AddNode("Right");
+                    var rightNode = binNode.AddNode("Right");
                     Build(binExpr.Right, rightNode);
                     break;
-                case UnaryExpression unExpr:
-                    parent.AddNode($"Operator: {unExpr.OperatorToken.Lexeme}");
 
-                    var operandNode = parent.AddNode("Operand");
+                case UnaryExpression unExpr:
+                    var unNode = parent.AddNode("UnaryExpression");
+                    unNode.AddNode($"Operator: {unExpr.OperatorToken.Lexeme}");
+
+                    var operandNode = unNode.AddNode("Operand");
                     Build(unExpr.Operand, operandNode);
+                    break;
+
+                case ParenthizedExpression parenExpr:
+                    var parenNode = parent.AddNode("ParenthesizedExpression");
+                    parenNode.AddNode("(");
+                    Build(parenExpr.Expression, parenNode);
+                    parenNode.AddNode(")");
+
+
                     break;
                 default:
                     parent.AddNode("[red](Unknown node type)[/]");

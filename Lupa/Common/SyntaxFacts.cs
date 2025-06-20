@@ -1,8 +1,9 @@
+using System.Globalization;
 using Lupa.Lexing;
 
 namespace Lupa
 {
-    internal static class Keyword
+    internal static class SyntaxFacts
     {
         private static readonly Dictionary<string, TokenKind> _keywords = new()
         {
@@ -41,10 +42,7 @@ namespace Lupa
         {
             return _keywords.TryGetValue(keyword, out var kind) ? kind : (TokenKind?)null;
         }
-    }
 
-    internal static class OperatorPrecedence
-    {
         public static int GetBinaryOperatorPrecedence(this TokenKind kind)
         {
             switch (kind)
@@ -97,5 +95,41 @@ namespace Lupa
                     return 0;
             }
         }
+
+        public static bool TryParseLuauNumber(this Token numberToken, out double value)
+        {
+            value = 0;
+
+            if (numberToken.Kind != TokenKind.Number)
+                return false;
+
+            var fixedNum = numberToken.Lexeme.Replace("_", "");
+            var lower = fixedNum.ToLowerInvariant();
+
+            try
+            {
+                if (lower.StartsWith("0x"))
+                {
+
+                    value = (double)Convert.ToInt64(fixedNum.Substring(2), 16);
+                    return true;
+                }
+                else if (lower.StartsWith("0b"))
+                {
+                    value = (double)Convert.ToInt64(fixedNum.Substring(2), 2);
+                    return true;
+                }
+                else
+                {
+                    return double.TryParse(fixedNum, NumberStyles.Float, CultureInfo.InvariantCulture, out value);
+                }
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+
     }
 }
