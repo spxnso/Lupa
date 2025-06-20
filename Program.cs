@@ -1,4 +1,5 @@
-﻿using Lupa.Lexing;
+﻿using Lupa;
+using Lupa.Lexing;
 using Lupa.Parsing;
 
 public class Program {
@@ -22,6 +23,10 @@ public class Program {
             var syntaxTree = parser.Parse();
 
             syntaxTree.Debug();
+
+            var evaluator = new Evaluator(syntaxTree.Root);
+
+            Console.WriteLine(evaluator.Evaluate());
         }
     }
 }
