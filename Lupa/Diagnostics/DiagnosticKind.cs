@@ -4,5 +4,6 @@ namespace Lupa.Diagnostics
     {
         UnexpectedCharacter,
         UnexpectedToken,
+        TypeError,
     }
 }

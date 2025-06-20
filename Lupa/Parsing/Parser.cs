@@ -84,7 +84,7 @@ namespace Lupa.Parsing
                     var expression = ParseExpression();
                     var rightParenToken = Match(TokenKind.RightParen);
 
-                    return new ParenthizedExpression(leftParenToken, expression, rightParenToken);
+                    return new ParenthesizedExpression(leftParenToken, expression, rightParenToken);
                 case TokenKind.Boolean:
                     var booleanToken = Advance();
                     return new LiteralExpression(booleanToken, booleanToken.Lexeme == "true");

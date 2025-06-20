@@ -1,12 +1,13 @@
 using Lupa.AST;
+using Lupa.Binding;
 using Lupa.Lexing;
 
 namespace Lupa
 {
     internal class Evaluator
     {
-        private readonly Expression _root;
-        public Evaluator(Expression root)
+        private readonly BoundExpression _root;
+        public Evaluator(BoundExpression root)
         {
             _root = root;
         }
@@ -16,61 +17,56 @@ namespace Lupa
             return EvaluateExpression(_root);
         }
 
-        public object EvaluateExpression(Expression expression)
+        public object EvaluateExpression(BoundExpression expression)
         {
-            if (expression is LiteralExpression n)
+            if (expression is BoundLiteralExpression n)
             {
                 return n.Value;
             }
+            // if (expression is UnaryExpression u)
+            // {
+            //     var operand = EvaluateExpression(u.Operand);
+            //     switch (u.OperatorToken.Kind)
+            //     {
+            //         case TokenKind.Minus:
+            //             return -(double)operand;
+            //         case TokenKind.Not:
+            //             return !(bool)operand;
+            //     }
+            // }
 
-            if (expression is ParenthizedExpression p)
-            {
-                return EvaluateExpression(p.Expression);
-            }
-
-            if (expression is UnaryExpression u)
-            {
-                var operand = EvaluateExpression(u.Operand);
-                switch (u.OperatorToken.Kind)
-                {
-                    case TokenKind.Minus:
-                        return -(double)operand;
-                    case TokenKind.Not:
-                        return !(bool)operand;
-                }
-            }
-
-            if (expression is BinaryExpression b)
+            if (expression is BoundBinaryExpression b)
             {
                 var left = EvaluateExpression(b.Left);
                 var right = EvaluateExpression(b.Right);
 
-                switch (b.OperatorToken.Kind)
+                switch (b.Operator.Kind)
                 {
-                    case TokenKind.Plus:
-                        return (double)left + (double)right;
-                    case TokenKind.Minus:
-                        return (double)left - (double)right;
-                    case TokenKind.Star:
-                        return (double)left * (double)right;
-                    case TokenKind.Slash:
-                        return (double)left / (double)right;
-                    case TokenKind.SlashSlash:
-                        return Math.Floor((double)left / (double)right);
-                    case TokenKind.Percent:
-                        return (double)left % (double)right;
-                    case TokenKind.Caret:
-                        return Math.Pow((double)left, (double)right);
-                    case TokenKind.And:
+                    case BoundBinaryOperatorKind.Addition:
+                        return (double) left + (double) right;
+                    case BoundBinaryOperatorKind.Subtraction:
+                        return (double) left - (double) right;
+                    case BoundBinaryOperatorKind.Multiplication:
+                        return (double) left * (double) right;
+                    case BoundBinaryOperatorKind.Division:
+                        return (double) left / (double) right;
+                    case BoundBinaryOperatorKind.FloorDivision:
+                        return Math.Floor((double) left / (double) right);
+                    case BoundBinaryOperatorKind.Modulus:
+                        return (double) left % (double) right;
+                    case BoundBinaryOperatorKind.Pow:
+                        return Math.Pow((double) left, (double) right);
+                    case BoundBinaryOperatorKind.LogicalAnd:
                         return (bool)left && (bool)right;
-                    case TokenKind.Or:
+                    case BoundBinaryOperatorKind.LogicalOr:
                         return (bool)left || (bool)right;
-                    case TokenKind.Equals:
-                        return left.Equals(right);
-                    case TokenKind.NotEquals:
-                        return !left.Equals(right);
+                    case BoundBinaryOperatorKind.Equals:
+                        return Equals(left, right);
+                    case BoundBinaryOperatorKind.NotEquals:
+                        return !Equals(left, right);
+
                     default:
-                        throw new Exception($"Unknown binary operator: {b.OperatorToken.Kind}");
+                        throw new Exception($"Unexpected binary operator {b.Operator.Kind}");
                 }
             }
 

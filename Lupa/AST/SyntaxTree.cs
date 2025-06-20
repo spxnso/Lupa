@@ -70,7 +70,7 @@ namespace Lupa.AST
                     Build(unExpr.Operand, operandNode);
                     break;
 
-                case ParenthizedExpression parenExpr:
+                case ParenthesizedExpression parenExpr:
                     var parenNode = parent.AddNode("ParenthesizedExpression");
                     parenNode.AddNode("(");
                     Build(parenExpr.Expression, parenNode);

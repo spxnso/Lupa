@@ -1,15 +1,15 @@
 using Lupa.Lexing;
 
 namespace Lupa.AST { 
-    internal sealed class ParenthizedExpression : Expression
+    internal sealed class ParenthesizedExpression : Expression
     {
-        public override NodeKind Kind => NodeKind.ParenthizedExpression;
+        public override NodeKind Kind => NodeKind.ParenthesizedExpression;
 
         public Token OpenParenthesisToken { get; }
         public Expression Expression { get; }
         public Token CloseParenthesisToken { get; }
 
-        public ParenthizedExpression(Token openParenthesisToken, Expression expression, Token closeParenthesisToken)
+        public ParenthesizedExpression(Token openParenthesisToken, Expression expression, Token closeParenthesisToken)
         {
             OpenParenthesisToken = openParenthesisToken;
             Expression = expression;

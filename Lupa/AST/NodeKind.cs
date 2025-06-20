@@ -4,6 +4,6 @@ namespace Lupa.AST
         LiteralExpression,
         UnaryExpression,
         BinaryExpression,
-        ParenthizedExpression,
+        ParenthesizedExpression,
     }
 }
