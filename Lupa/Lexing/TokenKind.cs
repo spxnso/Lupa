@@ -2,10 +2,17 @@ namespace Lupa.Lexing
 {
     public enum TokenKind {
         Eof = 0,
+        Error,
 
         // Primitives
         Number,
-
+        Boolean,
+        
+        Name,
+        Reserved,
+        
+        Equals,
+        Dot,
 
         // Binary Operators
         Plus,
@@ -15,6 +22,21 @@ namespace Lupa.Lexing
         SlashSlash,
         Percent,
         Caret,
-        Error
+
+        NotEquals,
+        EqualEquals,
+        GreaterEquals,
+        GreaterThan,
+        LessThan,
+        LessEquals,
+
+        DotDot,
+        Or,
+        And,
+
+        // Unary Operators
+
+        Hash,
+        Not,
     }
 }

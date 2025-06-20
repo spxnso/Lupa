@@ -14,14 +14,7 @@ public class Program {
             var lexer = new Lexer(input);
             var tokens = lexer.Lex();
 
-            Console.ForegroundColor = ConsoleColor.DarkGray;
-            foreach (var token in tokens) {
-                token.Debug();
-            }
-
-
-
-
+            lexer.Debug();
 
             Console.WriteLine();
 
@@ -29,16 +22,6 @@ public class Program {
             var syntaxTree = parser.Parse();
 
             syntaxTree.Debug();
-            
-            if (parser.Diagnostics.Any()) {
-                Console.ForegroundColor = ConsoleColor.Red;
-                foreach (var diagnostic in parser.Diagnostics) {
-                    diagnostic.Debug();
-                }
-                
-               
-            }
-            Console.ForegroundColor = ConsoleColor.White;
         }
     }
 }

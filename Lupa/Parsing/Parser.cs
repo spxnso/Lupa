@@ -50,8 +50,31 @@ namespace Lupa.Parsing
             return new SyntaxTree(root, eof, _diagnostics);
         }
 
-        private Expression ParseExpression() {
-            return ParsePrimaryExpression();
+        private Expression ParseExpression(int parentPrecedence = 0) {
+            Expression left;
+            
+            var unaryOperatorPrecedence = Current.Kind.GetUnaryOperatorPrecedence();
+            if (unaryOperatorPrecedence != 0 && unaryOperatorPrecedence > parentPrecedence) {
+                var operatorToken = Advance();
+                var operand = ParsePrimaryExpression();
+                left = new UnaryExpression(operatorToken, operand);
+            } else {
+                left = ParsePrimaryExpression();
+            }
+
+            while (true) {
+                var precedence = Current.Kind.GetBinaryOperatorPrecedence();
+                if (precedence == 0 || precedence <= parentPrecedence) {
+                    break;
+                }
+
+                var operatorToken = Advance();
+                var right = ParseExpression(precedence);
+
+                left = new BinaryExpression(left, operatorToken, right);
+            }
+
+            return left;
         }
 
         private Expression ParsePrimaryExpression() {

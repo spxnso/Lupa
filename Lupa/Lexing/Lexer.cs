@@ -81,9 +81,27 @@ namespace Lupa.Lexing
 
             StringBuilder sb = new();
 
-            sb.Append(AdvanceWhile(c => char.IsDigit(c))); // || c == '_'
+            sb.Append(AdvanceWhile(c => char.IsDigit(c) ||  c == '_'));
             return new Token(TokenKind.Number, sb.ToString(), numberTokenPos);
         }
+
+        private Token ReadName()
+        {
+            if (!(Current.IsAsciiLetter() || Current == '_' || Current == '@')) {
+                return Error(DiagnosticKind.UnexpectedCharacter, $"Unexpected character '{Current}' at start of name", Current.ToString(), _position);
+                throw new Exception();
+            }
+
+            StringBuilder sb = new();
+            sb.Append(Advance());
+            sb.Append(AdvanceWhile(c => char.IsLetterOrDigit(Current) || c == '_' && !AtEof()));
+
+            string name = sb.ToString();
+            
+            var kind = name.GetKindFromKeyword();
+            return (kind != null) ? new Token(kind.Value, name, _position) : new Token(TokenKind.Name, name, _position);
+        }
+
 
         private Token ReadNext()
         {
@@ -95,7 +113,9 @@ namespace Lupa.Lexing
             if (char.IsDigit(Current))
             {
                 return ReadNumber();
-            }
+            } else if (Current.IsAsciiLetter()) {
+                return ReadName();
+            } 
 
             switch (Current)
             {
@@ -115,11 +135,44 @@ namespace Lupa.Lexing
                     return new Token(TokenKind.Percent, Advance().ToString(), tokenPosition);
                 case '^':
                     return new Token(TokenKind.Caret, Advance().ToString(), tokenPosition);
+                case '>':
+                    if (LookAhead == '=')
+                    {
+                        return new Token(TokenKind.GreaterEquals, Advance(2), tokenPosition);
+                    }
+                    return new Token(TokenKind.GreaterThan, Advance().ToString(), tokenPosition);
+                case '<':
+                    if (LookAhead == '=')
+                    {
+                        return new Token(TokenKind.LessEquals, Advance(2), tokenPosition);
+                    }
+                    return new Token(TokenKind.LessThan, Advance().ToString(), tokenPosition);
+                case '=':
+                    if (LookAhead == '=')
+                    {
+                        return new Token(TokenKind.EqualEquals, Advance(2), tokenPosition);
+                    }
+                    return new Token(TokenKind.Equals, Advance().ToString(), tokenPosition);
+
+                case '~':
+                    if (LookAhead == '=') {
+                        return new Token(TokenKind.NotEquals, Advance(2), tokenPosition);
+                    }
+                    return Error(DiagnosticKind.UnexpectedCharacter, $"Unexpected character '{Current}'", Advance().ToString(), tokenPosition);
+                case '.':
+                    if (LookAhead == '.')
+                    {
+                        return new Token(TokenKind.DotDot, Advance(2), tokenPosition);
+                    }
+                    return new Token(TokenKind.Dot, Advance().ToString(), tokenPosition);
+                case '#':
+                    return new Token(TokenKind.Hash, Advance().ToString(), tokenPosition);
                 default:
+
                     return Error(DiagnosticKind.UnexpectedCharacter, $"Unexpected character '{Current}'", Advance().ToString(), tokenPosition);
             }
         }
-        
+
 
         public IEnumerable<Token> Lex() {
             while (!AtEof()) {
@@ -131,6 +184,16 @@ namespace Lupa.Lexing
             return Tokens;
         }
 
+        public void Debug() {
+            var color = Console.ForegroundColor;
+
+            Console.ForegroundColor = ConsoleColor.DarkGray;
+            foreach (var token in Tokens) {
+                token.Debug();
+            }
+
+            Console.ForegroundColor = color;
+        }
         public IEnumerable<Diagnostic> Diagnostics => _diagnostics;
         public IEnumerable<Token> Tokens => _tokens;
     }
