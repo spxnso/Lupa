@@ -21,26 +21,11 @@ namespace Lupa.AST
 
         public void Debug()
         {
-            var color = Console.ForegroundColor;
             var tree = new Tree("Root");
 
             Build(Root, tree);
 
-            Console.ForegroundColor = ConsoleColor.DarkGray;
             AnsiConsole.Write(tree);
-
-            Console.WriteLine();
-
-            if (Diagnostics.Any())
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                foreach (var diagnostic in Diagnostics)
-                {
-                    diagnostic.Debug();
-                }
-            }
-
-            Console.ForegroundColor = color;
         }
 
         private static void Build(AstNode node, IHasTreeNodes parent)

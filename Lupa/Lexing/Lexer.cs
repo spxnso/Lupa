@@ -7,13 +7,17 @@ namespace Lupa.Lexing
     {
         private readonly string _input;
         private List<Token> _tokens = new List<Token>();
-        private List<Diagnostic> _diagnostics = new List<Diagnostic>();
         private TokenPosition _position = new TokenPosition(1, 1, 0);
         
-        public Lexer(string input)
+        public Lexer(string input, DiagnosticBag diagnostics)
         {
             _input = input;
+            Diagnostics = diagnostics;
         }
+        public Lexer(string input) : this(input, new DiagnosticBag())
+        {
+        }
+        
         #region Position utils
         private bool AtEof(int offset = 0)
         {
@@ -69,11 +73,8 @@ namespace Lupa.Lexing
         #endregion
 
 
-        private Token Error(DiagnosticKind kind, string message, string lexeme, TokenPosition position) 
-        {
-            _diagnostics.Add(new Diagnostic(kind, message, position));
-            return new Token(TokenKind.Error, lexeme, position);
-        }
+        private Token Error => new Token(TokenKind.Error, String.Empty, _position);
+
 
         private Token ReadNumber()
         {
@@ -88,8 +89,8 @@ namespace Lupa.Lexing
         private Token ReadName()
         {
             if (!(Current.IsAsciiLetter() || Current == '_' || Current == '@')) {
-                return Error(DiagnosticKind.UnexpectedCharacter, $"Unexpected character '{Current}' at start of name", Current.ToString(), _position);
-                throw new Exception();
+                Diagnostics.Add(DiagnosticFactory.UnexpectedCharacter(_position, Current));
+                return Error;
             }
 
             StringBuilder sb = new();
@@ -158,7 +159,8 @@ namespace Lupa.Lexing
                     if (LookAhead == '=') {
                         return new Token(TokenKind.NotEquals, Advance(2), tokenPosition);
                     }
-                    return Error(DiagnosticKind.UnexpectedCharacter, $"Unexpected character '{Current}'", Advance().ToString(), tokenPosition);
+                    Diagnostics.Add(DiagnosticFactory.UnexpectedCharacter(_position, Current));
+                    return Error;
                 case '.':
                     if (LookAhead == '.')
                     {
@@ -172,8 +174,8 @@ namespace Lupa.Lexing
                 case ')':
                     return new Token(TokenKind.RightParen, Advance().ToString(), tokenPosition);
                 default:
-
-                    return Error(DiagnosticKind.UnexpectedCharacter, $"Unexpected character '{Current}'", Advance().ToString(), tokenPosition);
+                    Diagnostics.Add(DiagnosticFactory.UnexpectedCharacter(_position, Current));
+                    return Error;
             }
         }
 
@@ -189,16 +191,12 @@ namespace Lupa.Lexing
         }
 
         public void Debug() {
-            var color = Console.ForegroundColor;
-
-            Console.ForegroundColor = ConsoleColor.DarkGray;
             foreach (var token in Tokens) {
                 token.Debug();
             }
-
-            Console.ForegroundColor = color;
         }
-        public IEnumerable<Diagnostic> Diagnostics => _diagnostics;
+         public DiagnosticBag Diagnostics { get; }
+
         public IEnumerable<Token> Tokens => _tokens;
     }
 }

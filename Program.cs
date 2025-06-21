@@ -2,6 +2,7 @@
 using Lupa;
 using Lupa.AST;
 using Lupa.Binding;
+using Lupa.Diagnostics;
 using Lupa.Lexing;
 using Lupa.Parsing;
 
@@ -11,6 +12,7 @@ public class Program
     {
         while (true)
         {
+            var color = Console.ForegroundColor;
             Console.Write("> ");
 
             var input = Console.ReadLine();
@@ -18,38 +20,44 @@ public class Program
             {
                 return;
             }
+            
 
-            var lexer = new Lexer(input);
+            var diagnostics = new DiagnosticBag();
+            var lexer = new Lexer(input, diagnostics);
             var tokens = lexer.Lex();
 
             lexer.Debug();
 
             Console.WriteLine();
-
-            var parser = new Parser(tokens, lexer.Diagnostics);
-            var binder = new Binder();
+            
+            var parser = new Parser(tokens, diagnostics);
+            var binder = new Binder(diagnostics);
             var syntaxTree = parser.Parse();
-
-
             var boundRoot = binder.BindExpression(syntaxTree.Root);
+
+ 
             syntaxTree.Debug();
 
-
-            if (binder.Diagnostics.Any())
+            Console.WriteLine();
+            if (diagnostics.Any())
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                foreach (var diagnostic in binder.Diagnostics)
+                foreach (var diagnostic in diagnostics)
                 {
                     diagnostic.Debug();
                 }
-                Console.ForegroundColor = ConsoleColor.White;
+
+                Console.ForegroundColor = color;
             }
             else
             {
+
                 var evaluator = new Evaluator(boundRoot);
 
                 Console.WriteLine(evaluator.Evaluate());
             }
+
+            Console.ForegroundColor = color;
 
         
 

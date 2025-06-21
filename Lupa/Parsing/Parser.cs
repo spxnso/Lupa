@@ -8,14 +8,17 @@ namespace Lupa.Parsing
     internal class Parser {
         private readonly List<Token> _tokens = new List<Token>();
         private int _position;
-        private List<Diagnostic> _diagnostics = new List<Diagnostic>();
-        public IEnumerable<Diagnostic> Diagnostics => _diagnostics;
-        public Parser(IEnumerable<Token> tokens, IEnumerable<Diagnostic> diagnostics)
+        private DiagnosticBag _diagnostics { get; set; }
+        public Parser(IEnumerable<Token> tokens, DiagnosticBag diagnostics)
         {
             _tokens = tokens.ToList();
             _position = 0;
-            _diagnostics.AddRange(diagnostics);
+            _diagnostics = diagnostics;
         }
+        public Parser(IEnumerable<Token> tokens) : this(tokens, new DiagnosticBag())
+        {
+        }
+
 
         private Token Peek(int offset = 0) {
             var index = offset + _position;
@@ -37,7 +40,7 @@ namespace Lupa.Parsing
                 return Advance();
             }
             else {
-                _diagnostics.Add(new Diagnostic(DiagnosticKind.UnexpectedToken, $"Expected token of kind <{kind}>, found <{Current.Kind}> instead.", Current.Position));
+                _diagnostics.Add(DiagnosticFactory.MismatchedToken(Current.Position, kind, Current.Kind));
                 return Advance();
             }
         }
@@ -92,7 +95,7 @@ namespace Lupa.Parsing
                     var literalToken = Advance();
                     return new LiteralExpression(literalToken, literalToken.TryParseLuauNumber(out var value) ? value : 0);
                 default:
-                    _diagnostics.Add(new Diagnostic(DiagnosticKind.UnexpectedToken, $"Unexpected token {Current.Kind} at position {Current.Position}.", Current.Position));
+                    _diagnostics.Add(DiagnosticFactory.UnexpectedToken(Current.Position, Current.Kind));
                     throw new Exception($"Unexpected token {Current.Kind} at position {Current.Position}.");
             }
         }

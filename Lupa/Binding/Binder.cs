@@ -4,9 +4,12 @@ using Lupa.Diagnostics;
 namespace Lupa.Binding
 {
     internal sealed class Binder {
-        private List<Diagnostic> _diagnostics = new List<Diagnostic>();
+        public DiagnosticBag Diagnostics { get; }
+        public Binder(DiagnosticBag diagnostics)
+        {
+            Diagnostics = diagnostics;
+        }
 
-        public IEnumerable<Diagnostic> Diagnostics => _diagnostics;
 
         public BoundExpression BindExpression(Expression expr) {
             switch(expr.Kind) {
@@ -29,11 +32,7 @@ namespace Lupa.Binding
             var boundOperator = BoundUnaryOperator.Bind(expr.OperatorToken.Kind, boundOperand.Type);
 
             if (boundOperator == null) {
-                _diagnostics.Add(new Diagnostic(
-                    DiagnosticKind.TypeError,
-                    $"Operator '{expr.OperatorToken.Lexeme}' cannot be applied to operand of type '{boundOperand.Type}'",
-                    expr.OperatorToken.Position
-                ));
+                Diagnostics.Add(DiagnosticFactory.UnaryOperatorTypeError(expr.OperatorToken.Position, expr.OperatorToken.Kind, boundOperand.Type));
 
                 return boundOperand;
             }
@@ -48,11 +47,7 @@ namespace Lupa.Binding
             var boundOperator = BoundBinaryOperator.Bind(expr.OperatorToken.Kind, boundLeft.Type, boundRight.Type);
 
             if (boundOperator == null) {
-                _diagnostics.Add(new Diagnostic(
-                    DiagnosticKind.TypeError,
-                    $"Operator '{expr.OperatorToken.Lexeme}' cannot be applied to operands of type '{boundLeft.Type}' and '{boundRight.Type}'",
-                    expr.OperatorToken.Position
-                ));
+                Diagnostics.Add(DiagnosticFactory.BinaryOperatorTypeError(expr.OperatorToken.Position, expr.OperatorToken.Kind, boundLeft.Type, boundRight.Type));
 
                 return boundLeft;
             }
