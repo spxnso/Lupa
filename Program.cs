@@ -58,9 +58,6 @@ public class Program
             }
 
             Console.ForegroundColor = color;
-
-        
-
         }
     }
 }
