@@ -2,7 +2,7 @@ using Lupa.Lexing;
 
 namespace Lupa.Binding
 {
-    internal class BoundBinaryOperator
+    public class BoundBinaryOperator
     {
         private BoundBinaryOperator(TokenKind tokenKind, BoundBinaryOperatorKind kind, Type type) : this(tokenKind, kind, type, type, type)
         {

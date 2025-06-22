@@ -1,6 +1,6 @@
 namespace Lupa.Binding
 {
-    internal enum BoundNodeKind
+    public enum BoundNodeKind
     {
         LiteralExpression,
         UnaryExpression,

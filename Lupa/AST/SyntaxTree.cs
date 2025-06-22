@@ -6,7 +6,7 @@ using Spectre.Console;
 
 namespace Lupa.AST
 {
-    internal sealed class SyntaxTree
+    public sealed class SyntaxTree
     {
         public IEnumerable<Diagnostic> Diagnostics { get; set; }
         public Expression Root { get; set; }

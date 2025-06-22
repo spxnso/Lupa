@@ -5,7 +5,7 @@ using Lupa.AST;
 namespace Lupa.Parsing
 {
 
-    internal class Parser {
+    public class Parser {
         private readonly List<Token> _tokens = new List<Token>();
         private int _position;
         private DiagnosticBag _diagnostics { get; set; }

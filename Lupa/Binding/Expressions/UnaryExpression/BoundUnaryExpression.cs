@@ -1,6 +1,6 @@
 namespace Lupa.Binding
 {
-    internal sealed class BoundUnaryExpression : BoundExpression {
+    public sealed class BoundUnaryExpression : BoundExpression {
         public BoundUnaryExpression(BoundUnaryOperator op, BoundExpression operand)
         {
             Operator = op;

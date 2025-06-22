@@ -1,7 +1,7 @@
 using Lupa.Lexing;
 
 namespace Lupa.AST {
-       internal sealed class LiteralExpression : Expression
+    public sealed class LiteralExpression : Expression
     {
         public override NodeKind Kind => NodeKind.LiteralExpression;
 

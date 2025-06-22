@@ -2,7 +2,7 @@ using Lupa.Lexing;
 
 namespace Lupa.AST
 {
-    internal sealed class BinaryExpression : Expression
+    public sealed class BinaryExpression : Expression
     {
         public override NodeKind Kind => NodeKind.BinaryExpression;
 

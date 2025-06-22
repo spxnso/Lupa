@@ -1,6 +1,6 @@
 namespace Lupa.Binding
 {
-    internal sealed class BoundBinaryExpression : BoundExpression {
+    public sealed class BoundBinaryExpression : BoundExpression {
         public BoundBinaryExpression(BoundExpression left, BoundBinaryOperator op, BoundExpression right)
         {
             Left = left;

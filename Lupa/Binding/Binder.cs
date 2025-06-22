@@ -3,7 +3,7 @@ using Lupa.Diagnostics;
 
 namespace Lupa.Binding
 {
-    internal sealed class Binder {
+    public sealed class Binder {
         public DiagnosticBag Diagnostics { get; }
         public Binder(DiagnosticBag diagnostics)
         {

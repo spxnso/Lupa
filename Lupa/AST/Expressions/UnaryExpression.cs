@@ -2,7 +2,7 @@ using Lupa.Lexing;
 
 namespace Lupa.AST
 {
-    internal sealed class UnaryExpression : Expression
+    public sealed class UnaryExpression : Expression
     {
         public override NodeKind Kind => NodeKind.UnaryExpression;
         public Token OperatorToken { get; }

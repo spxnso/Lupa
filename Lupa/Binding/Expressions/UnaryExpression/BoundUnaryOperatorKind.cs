@@ -1,6 +1,6 @@
 namespace Lupa.Binding
 {
-    internal enum BoundUnaryOperatorKind
+    public enum BoundUnaryOperatorKind
     {
 
         Negative,

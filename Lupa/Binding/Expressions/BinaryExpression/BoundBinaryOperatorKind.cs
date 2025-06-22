@@ -1,6 +1,6 @@
 namespace Lupa.Binding
 {
-    internal enum BoundBinaryOperatorKind
+    public enum BoundBinaryOperatorKind
     {
         Addition,
         Subtraction,

@@ -1,7 +1,7 @@
 using Lupa.Lexing;
 
 namespace Lupa.AST { 
-    internal sealed class ParenthesizedExpression : Expression
+    public sealed class ParenthesizedExpression : Expression
     {
         public override NodeKind Kind => NodeKind.ParenthesizedExpression;
 

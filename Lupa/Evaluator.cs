@@ -4,7 +4,7 @@ using Lupa.Lexing;
 namespace Lupa
 {
 
-    internal class Evaluator
+    public class Evaluator
     {
         private readonly BoundExpression _root;
         public Evaluator(BoundExpression root)
