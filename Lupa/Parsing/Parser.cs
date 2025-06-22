@@ -94,6 +94,9 @@ namespace Lupa.Parsing
                 case TokenKind.Number:
                     var literalToken = Advance();
                     return new LiteralExpression(literalToken, literalToken.TryParseLuauNumber(out var value) ? value : 0);
+                case TokenKind.Name:
+                    var nameToken = Advance();
+                    return new NameExpression(nameToken);
                 default:
                     _diagnostics.Add(DiagnosticFactory.UnexpectedToken(Current.Position, Current.Kind));
                     throw new Exception($"Unexpected token {Current.Kind} at position {Current.Position}.");

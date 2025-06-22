@@ -66,8 +66,12 @@ namespace Lupa
                         return !Equals(left, right);
                     case BoundBinaryOperatorKind.GreaterThan:
                         return (double)left > (double)right;
+                    case BoundBinaryOperatorKind.GreaterEquals:
+                        return (double)left >= (double)right;
                     case BoundBinaryOperatorKind.LessThan:
                         return (double)left < (double)right;
+                    case BoundBinaryOperatorKind.LessEquals:
+                        return (double)left <= (double)right;
                     default:
                         throw new Exception($"Unexpected binary operator {b.Operator.Kind}");
                 }
