@@ -24,6 +24,7 @@ namespace Lupa.Binding
         {
             new BoundUnaryOperator(TokenKind.Not, BoundUnaryOperatorKind.LogicalNegation, typeof(bool)),
             new BoundUnaryOperator(TokenKind.Minus, BoundUnaryOperatorKind.Negative, typeof(double)),
+            new BoundUnaryOperator(TokenKind.Hash, BoundUnaryOperatorKind.Length, typeof(string), typeof(int)),
         };
         public static BoundUnaryOperator? Bind(TokenKind tokenKind, Type operandType)
         {

@@ -6,6 +6,7 @@ namespace Lupa.Lexing
 
         // Primitives
         Number,
+        String,
         Boolean,
         
         Name,
@@ -42,5 +43,6 @@ namespace Lupa.Lexing
 
         Hash,
         Not,
+
     }
 }

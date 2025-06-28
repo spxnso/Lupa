@@ -8,7 +8,7 @@ namespace Lupa.Lexing
         private readonly string _input;
         private List<Token> _tokens = new List<Token>();
         private TokenPosition _position = new TokenPosition(1, 1, 0);
-        
+
         public Lexer(string input, DiagnosticBag diagnostics)
         {
             _input = input;
@@ -17,7 +17,7 @@ namespace Lupa.Lexing
         public Lexer(string input) : this(input, new DiagnosticBag())
         {
         }
-        
+
         #region Position utils
         private bool AtEof(int offset = 0)
         {
@@ -60,8 +60,11 @@ namespace Lupa.Lexing
         private string AdvanceWhile(Func<char, bool> predicate)
         {
             StringBuilder sb = new();
-            while (!AtEof() && predicate(Current))
+
+            while (!AtEof())
             {
+                char c = Current;
+                if (!predicate(c)) break;
                 sb.Append(Advance());
             }
             return sb.ToString();
@@ -75,20 +78,92 @@ namespace Lupa.Lexing
 
         private Token Error => new Token(TokenKind.Error, String.Empty, _position);
 
+        private Token ReadQuotedString()
+        {
+            TokenPosition stringTokenPos = _position;
+            StringBuilder sb = new();
+
+            char quoteChar = Advance();
+
+            while (Current != quoteChar)
+            {
+                if (AtEof())
+                {
+                    Diagnostics.Add(DiagnosticFactory.UnexpectedCharacter(_position, Current));
+                    return Error;
+                }
+
+                sb.Append(Advance());
+            }
+
+            Advance();
+
+            return new Token(TokenKind.String, sb.ToString(), stringTokenPos);
+        }
 
         private Token ReadNumber()
         {
             TokenPosition numberTokenPos = _position;
-
+            bool hasDot = false;
+            bool hasExponent = false;
             StringBuilder sb = new();
 
-            sb.Append(AdvanceWhile(c => char.IsDigit(c) ||  c == '_'));
+            if (Current == '0' && (LookAhead == 'x' || LookAhead == 'X'))
+            {
+                sb.Append(Advance(2));
+                sb.Append(AdvanceWhile(c => char.IsDigit(c) || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F') || c == '_'));
+            }
+            else if (Current == '0' && (LookAhead == 'b' || LookAhead == 'B'))
+            {
+                sb.Append(Advance(2));
+                sb.Append(AdvanceWhile(c => c == '0' || c == '1' || c == '_'));
+            }
+            else
+            {
+                while (true)
+                {
+                    if (char.IsDigit(Current) || Current == '_')
+                    {
+                        sb.Append(Advance());
+                    }
+                    else if (Current == '.' && !hasDot && !hasExponent && char.IsDigit(Peek(1)))
+                    {
+                        hasDot = true;
+                        sb.Append(Advance());
+                    }
+                    else if ((Current == 'e' || Current == 'E') && !hasExponent)
+                    {
+                        hasExponent = true;
+                        sb.Append(Advance());
+
+                        if (Current == '+' || Current == '-')
+                            sb.Append(Advance());
+
+                        if (!(char.IsDigit(Current) || Current == '_'))
+                        {
+                            Diagnostics.Add(DiagnosticFactory.MalformedNumber(numberTokenPos, sb.ToString()));
+                            return Error;
+                        }
+                    }
+                    else if (char.IsLetter(Current))
+                    {
+                        Diagnostics.Add(DiagnosticFactory.MalformedNumber(numberTokenPos, sb.ToString()));
+                        return Error;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+            }
+
             return new Token(TokenKind.Number, sb.ToString(), numberTokenPos);
         }
 
         private Token ReadName()
         {
-            if (!(Current.IsAsciiLetter() || Current == '_' || Current == '@')) {
+            if (!(Current.IsAsciiLetter() || Current == '_' || Current == '@'))
+            {
                 Diagnostics.Add(DiagnosticFactory.UnexpectedCharacter(_position, Current));
                 return Error;
             }
@@ -98,7 +173,7 @@ namespace Lupa.Lexing
             sb.Append(AdvanceWhile(c => char.IsLetterOrDigit(Current) || c == '_' && !AtEof()));
 
             string name = sb.ToString();
-            
+
             var kind = name.GetKindFromKeyword();
             return (kind != null) ? new Token(kind.Value, name, _position) : new Token(TokenKind.Name, name, _position);
         }
@@ -114,9 +189,15 @@ namespace Lupa.Lexing
             if (char.IsDigit(Current))
             {
                 return ReadNumber();
-            } else if (Current.IsAsciiLetter()) {
+            }
+            else if (Current.IsAsciiLetter())
+            {
                 return ReadName();
-            } 
+            }
+            else if (Current == '"' || Current == '\'')
+            {
+                return ReadQuotedString();
+            }
 
             switch (Current)
             {
@@ -156,7 +237,8 @@ namespace Lupa.Lexing
                     return new Token(TokenKind.Equals, Advance().ToString(), tokenPosition);
 
                 case '~':
-                    if (LookAhead == '=') {
+                    if (LookAhead == '=')
+                    {
                         return new Token(TokenKind.NotEquals, Advance(2), tokenPosition);
                     }
                     Diagnostics.Add(DiagnosticFactory.UnexpectedCharacter(_position, Current));
@@ -180,22 +262,26 @@ namespace Lupa.Lexing
         }
 
 
-        public IEnumerable<Token> Lex() {
-            while (!AtEof()) {
-                Token token = ReadNext(); 
+        public IEnumerable<Token> Lex()
+        {
+            while (!AtEof())
+            {
+                Token token = ReadNext();
                 _tokens.Add(token);
             }
-            
+
             _tokens.Add(new Token(TokenKind.Eof, String.Empty, _position));
             return Tokens;
         }
 
-        public void Debug() {
-            foreach (var token in Tokens) {
+        public void Debug()
+        {
+            foreach (var token in Tokens)
+            {
                 token.Debug();
             }
         }
-         public DiagnosticBag Diagnostics { get; }
+        public DiagnosticBag Diagnostics { get; }
 
         public IEnumerable<Token> Tokens => _tokens;
     }

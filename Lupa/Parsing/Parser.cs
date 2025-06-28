@@ -88,12 +88,15 @@ namespace Lupa.Parsing
                     var rightParenToken = Match(TokenKind.RightParen);
 
                     return new ParenthesizedExpression(leftParenToken, expression, rightParenToken);
+                case TokenKind.String:
+                    var stringToken = Advance();
+                    return new LiteralExpression(stringToken, stringToken.Lexeme);
                 case TokenKind.Boolean:
                     var booleanToken = Advance();
                     return new LiteralExpression(booleanToken, booleanToken.Lexeme == "true");
                 case TokenKind.Number:
-                    var literalToken = Advance();
-                    return new LiteralExpression(literalToken, literalToken.TryParseLuauNumber(out var value) ? value : 0);
+                    var numberToken = Advance();
+                    return new LiteralExpression(numberToken, numberToken.TryParseLuauNumber(out var numberValue) ? numberValue : 0);
                 case TokenKind.Name:
                     var nameToken = Advance();
                     return new NameExpression(nameToken);

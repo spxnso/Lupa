@@ -19,7 +19,10 @@ namespace Lupa.Diagnostics
             return new Diagnostic(DiagnosticKind.Error, $"Unexpected character '{character}'.", position);
         }
 
-
+        public static Diagnostic MalformedNumber(TokenPosition position, string number)
+        {
+            return new Diagnostic(DiagnosticKind.Error, $"Malformed number '{number}'.", position);
+        }
         public static Diagnostic BinaryOperatorTypeError(TokenPosition position, TokenKind operatorKind, Type leftType, Type rightType)
         {
             return new Diagnostic(

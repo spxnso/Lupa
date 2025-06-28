@@ -17,6 +17,7 @@ namespace Lupa
             return EvaluateExpression(_root);
         }
 
+        
         public object EvaluateExpression(BoundExpression expression)
         {
             if (expression is BoundLiteralExpression n)
@@ -32,6 +33,8 @@ namespace Lupa
                         return -(double)operand;
                     case BoundUnaryOperatorKind.LogicalNegation:
                         return !(bool)operand;
+                    case BoundUnaryOperatorKind.Length:
+                        return ((string)operand).Length;
                 }
             }
 
@@ -39,7 +42,7 @@ namespace Lupa
             {
                 var left = EvaluateExpression(b.Left);
                 var right = EvaluateExpression(b.Right);
-
+                
                 switch (b.Operator.Kind)
                 {
                     case BoundBinaryOperatorKind.Addition:

@@ -95,7 +95,7 @@ namespace Lupa
                     return 0;
             }
         }
-
+        
         public static bool TryParseLuauNumber(this Token numberToken, out double value)
         {
             value = 0;
