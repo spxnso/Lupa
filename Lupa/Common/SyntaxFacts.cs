@@ -7,35 +7,43 @@ namespace Lupa
     {
         private static readonly Dictionary<string, TokenKind> _keywords = new()
         {
-            // Lua / Luau shared
-            ["and"] = TokenKind.And,
-            ["break"] = TokenKind.Reserved,
-            ["do"] = TokenKind.Reserved,
-            ["else"] = TokenKind.Reserved,
-            ["elseif"] = TokenKind.Reserved,
-            ["end"] = TokenKind.Reserved,
-
-            ["for"] = TokenKind.Reserved,
-            ["function"] = TokenKind.Reserved,
-            ["if"] = TokenKind.Reserved,
-            ["in"] = TokenKind.Reserved,
-            ["local"] = TokenKind.Reserved,
-            ["nil"] = TokenKind.Reserved,
-            ["not"] = TokenKind.Not,
-            ["or"] = TokenKind.Or,
-            ["repeat"] = TokenKind.Reserved,
-            ["return"] = TokenKind.Reserved,
-            ["then"] = TokenKind.Reserved,
+            ["nil"] = TokenKind.Nil,
+            
             ["true"] = TokenKind.Boolean,
             ["false"] = TokenKind.Boolean,
-            ["until"] = TokenKind.Reserved,
-            ["while"] = TokenKind.Reserved,
-            ["continue"] = TokenKind.Reserved,
-            ["type"] = TokenKind.Reserved,
-            ["typeof"] = TokenKind.Reserved,
-            ["export"] = TokenKind.Reserved,
-            ["extends"] = TokenKind.Reserved,
-            ["require"] = TokenKind.Reserved,
+
+            ["if"] = TokenKind.If,
+            ["then"] = TokenKind.Then,
+            ["else"] = TokenKind.Else,
+            ["elseif"] = TokenKind.ElseIf,
+
+            ["and"] = TokenKind.And,
+            ["or"] = TokenKind.Or,
+
+            ["not"] = TokenKind.Not,
+            
+            ["break"] = TokenKind.Break,
+            ["return"] = TokenKind.Return,
+            ["end"] = TokenKind.End,
+
+            ["for"] = TokenKind.For,
+            ["function"] = TokenKind.Function,
+            ["if"] = TokenKind.If,
+            ["in"] = TokenKind.In,
+            ["local"] = TokenKind.Local,
+
+
+            ["do"] = TokenKind.Do,
+            ["until"] = TokenKind.Until,
+            ["while"] = TokenKind.While,
+            ["repeat"] = TokenKind.Repeat,
+            ["continue"] = TokenKind.Continue,
+
+            ["type"] = TokenKind.Type,
+            ["typeof"] = TokenKind.TypeOf,
+            ["export"] = TokenKind.Export,
+            ["extends"] = TokenKind.Extends,
+            ["require"] = TokenKind.Require,
         };
 
         public static TokenKind? GetKindFromKeyword(this string keyword)

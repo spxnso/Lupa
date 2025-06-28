@@ -34,7 +34,7 @@ namespace Lupa
                     case BoundUnaryOperatorKind.LogicalNegation:
                         return !(bool)operand;
                     case BoundUnaryOperatorKind.Length:
-                        return ((string)operand).Length;
+                        return (double)((string)operand).Length;
                 }
             }
 
@@ -75,6 +75,8 @@ namespace Lupa
                         return (double)left < (double)right;
                     case BoundBinaryOperatorKind.LessEquals:
                         return (double)left <= (double)right;
+                    case BoundBinaryOperatorKind.Concatenation:
+                        return (string)left + (string)right;
                     default:
                         throw new Exception($"Unexpected binary operator {b.Operator.Kind}");
                 }

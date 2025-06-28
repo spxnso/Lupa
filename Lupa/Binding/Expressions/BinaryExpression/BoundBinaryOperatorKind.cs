@@ -17,5 +17,6 @@ namespace Lupa.Binding
         LessThan,
         GreaterEquals,
         LessEquals,
+        Concatenation,
     }
 }

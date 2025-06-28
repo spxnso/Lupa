@@ -42,6 +42,8 @@ namespace Lupa.Binding
             new BoundBinaryOperator(TokenKind.EqualEquals, BoundBinaryOperatorKind.Equals, typeof(double), typeof(double), typeof(bool)),
             new BoundBinaryOperator(TokenKind.NotEquals, BoundBinaryOperatorKind.NotEquals, typeof(double), typeof(double), typeof(bool)),
 
+            // Strings
+            new BoundBinaryOperator(TokenKind.DotDot, BoundBinaryOperatorKind.Concatenation, typeof(string), typeof(string), typeof(string)),
 
             // Bools
             new BoundBinaryOperator(TokenKind.And, BoundBinaryOperatorKind.LogicalAnd, typeof(bool)),
