@@ -41,6 +41,22 @@ namespace Lupa.Diagnostics
             );
         }
 
+        internal static Diagnostic UnterminatedString(TokenPosition stringTokenPos, string v)
+        {
+            return new Diagnostic(
+                DiagnosticKind.Error,
+                $"Unterminated string literal at position {stringTokenPos}.", 
+                stringTokenPos
+            );
+        }
 
+        internal static Diagnostic UnterminatedBlockString(TokenPosition stringTokenPos, string v)
+        {
+            return new Diagnostic(
+                DiagnosticKind.Error,
+                $"Unterminated block string literal at position {stringTokenPos}.",
+                stringTokenPos
+            );
+        }
     };
 }

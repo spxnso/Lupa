@@ -9,6 +9,7 @@ namespace Lupa.Lexing
         private List<Token> _tokens = new List<Token>();
         private TokenPosition _position = new TokenPosition(1, 1, 0);
 
+        private Token Error => new Token(TokenKind.Error, String.Empty, _position);
         public Lexer(string input, DiagnosticBag diagnostics)
         {
             _input = input;
@@ -76,7 +77,42 @@ namespace Lupa.Lexing
         #endregion
 
 
-        private Token Error => new Token(TokenKind.Error, String.Empty, _position);
+
+        #region Readers
+        private char? ReadBackslashInString()
+        {
+            Advance();
+
+            switch (Current)
+            {
+                case '\r':
+                    Advance();
+                    if (Current == '\n') Advance();
+                    return null;
+
+                case 'z':
+                    Advance();
+                    AdvanceWhile(char.IsWhiteSpace);
+                    return null;
+
+                case 'a': Advance(); return '\a';
+                case 'b': Advance(); return '\b';
+                case 'f': Advance(); return '\f';
+                case 'n': Advance(); return '\n';
+                case 'r': Advance(); return '\r';
+                case 't': Advance(); return '\t';
+                case 'v': Advance(); return '\v';
+                case '\\': Advance(); return '\\';
+                case '\"': Advance(); return '\"';
+                case '\'': Advance(); return '\'';
+
+                case '\0': return null;
+
+                default:
+                    return Advance();
+            }
+        }
+
 
         private Token ReadQuotedString()
         {
@@ -93,12 +129,87 @@ namespace Lupa.Lexing
                     return Error;
                 }
 
-                sb.Append(Advance());
+                switch (Current)
+                {
+                    case '\0':
+                    case '\r':
+                    case '\n':
+                        Diagnostics.Add(DiagnosticFactory.UnterminatedString(stringTokenPos, sb.ToString()));
+                        return Error;
+
+                    case '\\':
+                        char? escaped = ReadBackslashInString();
+                        if (escaped is not null)
+                            sb.Append(escaped.Value);
+                        break;
+
+                    default:
+                        sb.Append(Advance());
+                        break;
+                }
             }
 
             Advance();
 
             return new Token(TokenKind.String, sb.ToString(), stringTokenPos);
+        }
+
+        private Token ReadBlockString()
+        {
+            TokenPosition startPos = _position;
+            StringBuilder sb = new();
+
+            // Consume initial '['
+            Advance();
+
+            // Count '=' for opening delimiter
+            int openEqualsCount = 0;
+            while (Current == '=')
+            {
+                openEqualsCount++;
+                Advance();
+            }
+
+            // Expect opening '['
+            if (Current != '[')
+            {
+                Diagnostics.Add(DiagnosticFactory.UnterminatedBlockString(startPos, sb.ToString()));
+                return Error;
+            }
+
+            // Consume second '['
+            Advance();
+
+            // Read content until matching ]=*=]
+            while (!AtEof())
+            {
+                if (Current == ']')
+                {
+                    Advance();
+
+                    int closeEqualsCount = 0;
+                    while (Current == '=')
+                    {
+                        closeEqualsCount++;
+                        Advance();
+                    }
+
+                    if (Current == ']' && closeEqualsCount == openEqualsCount)
+                    {
+                        Advance();
+                        return new Token(TokenKind.String, sb.ToString(), startPos);
+                    }
+
+                    sb.Append(Advance());
+                }
+                else
+                {
+                    sb.Append(Advance());
+                }
+            }
+
+            Diagnostics.Add(DiagnosticFactory.UnterminatedBlockString(startPos, sb.ToString()));
+            return Error;
         }
 
         private Token ReadNumber()
@@ -255,6 +366,12 @@ namespace Lupa.Lexing
                     return new Token(TokenKind.LeftParen, Advance().ToString(), tokenPosition);
                 case ')':
                     return new Token(TokenKind.RightParen, Advance().ToString(), tokenPosition);
+                case '[':
+                    if (LookAhead == '[' || LookAhead == '=')
+                    {
+                        return ReadBlockString();
+                    }
+                    return new Token(TokenKind.LeftBracket, Advance().ToString(), tokenPosition);
                 default:
                     Diagnostics.Add(DiagnosticFactory.UnexpectedCharacter(_position, Current));
                     return Error;
@@ -262,6 +379,7 @@ namespace Lupa.Lexing
         }
 
 
+        #endregion
         public IEnumerable<Token> Lex()
         {
             while (!AtEof())
@@ -274,6 +392,7 @@ namespace Lupa.Lexing
             return Tokens;
         }
 
+        #region Public 
         public void Debug()
         {
             foreach (var token in Tokens)
@@ -281,8 +400,10 @@ namespace Lupa.Lexing
                 token.Debug();
             }
         }
+
         public DiagnosticBag Diagnostics { get; }
 
         public IEnumerable<Token> Tokens => _tokens;
+        #endregion
     }
 }

@@ -21,6 +21,8 @@ namespace Lupa.Lexing
         LeftParen,
         RightParen,
 
+        LeftBracket,
+
         #endregion
         
         #region Operators
@@ -79,6 +81,7 @@ namespace Lupa.Lexing
         Require,
         Return,
         Then,
+
         #endregion
     }
 }
