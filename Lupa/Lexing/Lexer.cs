@@ -9,7 +9,9 @@ namespace Lupa.Lexing
         private List<Token> _tokens = new List<Token>();
         private TokenPosition _position = new TokenPosition(1, 1, 0);
 
-        private Token Error => new Token(TokenKind.Error, String.Empty, _position);
+        private static Token Error(TokenPosition errorPosition) {
+            return new Token(TokenKind.Error, string.Empty, errorPosition);
+        }
         public Lexer(string input, DiagnosticBag diagnostics)
         {
             _input = input;
@@ -126,7 +128,7 @@ namespace Lupa.Lexing
                 if (AtEof())
                 {
                     Diagnostics.Add(DiagnosticFactory.UnexpectedCharacter(_position, Current));
-                    return Error;
+                    return Error(_position);
                 }
 
                 switch (Current)
@@ -135,7 +137,7 @@ namespace Lupa.Lexing
                     case '\r':
                     case '\n':
                         Diagnostics.Add(DiagnosticFactory.UnterminatedString(stringTokenPos, sb.ToString()));
-                        return Error;
+                        return Error(_position);
 
                     case '\\':
                         char? escaped = ReadBackslashInString();
@@ -159,10 +161,8 @@ namespace Lupa.Lexing
             TokenPosition startPos = _position;
             StringBuilder sb = new();
 
-            // Consume initial '['
             Advance();
 
-            // Count '=' for opening delimiter
             int openEqualsCount = 0;
             while (Current == '=')
             {
@@ -170,17 +170,12 @@ namespace Lupa.Lexing
                 Advance();
             }
 
-            // Expect opening '['
             if (Current != '[')
             {
                 Diagnostics.Add(DiagnosticFactory.UnterminatedBlockString(startPos, sb.ToString()));
-                return Error;
+                return Error(_position);
             }
-
-            // Consume second '['
             Advance();
-
-            // Read content until matching ]=*=]
             while (!AtEof())
             {
                 if (Current == ']')
@@ -209,7 +204,7 @@ namespace Lupa.Lexing
             }
 
             Diagnostics.Add(DiagnosticFactory.UnterminatedBlockString(startPos, sb.ToString()));
-            return Error;
+            return Error(_position);
         }
 
         private Token ReadNumber()
@@ -253,13 +248,13 @@ namespace Lupa.Lexing
                         if (!(char.IsDigit(Current) || Current == '_'))
                         {
                             Diagnostics.Add(DiagnosticFactory.MalformedNumber(numberTokenPos, sb.ToString()));
-                            return Error;
+                            return Error(_position);
                         }
                     }
                     else if (char.IsLetter(Current))
                     {
                         Diagnostics.Add(DiagnosticFactory.MalformedNumber(numberTokenPos, sb.ToString()));
-                        return Error;
+                        return Error(_position);
                     }
                     else
                     {
@@ -276,7 +271,7 @@ namespace Lupa.Lexing
             if (!(Current.IsAsciiLetter() || Current == '_' || Current == '@'))
             {
                 Diagnostics.Add(DiagnosticFactory.UnexpectedCharacter(_position, Current));
-                return Error;
+                return Error(_position);
             }
 
             StringBuilder sb = new();
@@ -353,7 +348,7 @@ namespace Lupa.Lexing
                         return new Token(TokenKind.NotEquals, Advance(2), tokenPosition);
                     }
                     Diagnostics.Add(DiagnosticFactory.UnexpectedCharacter(_position, Current));
-                    return Error;
+                    return Error(_position);
                 case '.':
                     if (LookAhead == '.')
                     {
@@ -373,8 +368,9 @@ namespace Lupa.Lexing
                     }
                     return new Token(TokenKind.LeftBracket, Advance().ToString(), tokenPosition);
                 default:
-                    Diagnostics.Add(DiagnosticFactory.UnexpectedCharacter(_position, Current));
-                    return Error;
+                    var errorPosition = _position;
+                    Diagnostics.Add(DiagnosticFactory.UnexpectedCharacter(errorPosition, Advance()));
+                    return Error(errorPosition);
             }
         }
 
@@ -394,7 +390,7 @@ namespace Lupa.Lexing
 
         #region Public 
         public void Debug()
-        {
+        {   
             foreach (var token in Tokens)
             {
                 token.Debug();

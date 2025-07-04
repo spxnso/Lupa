@@ -101,11 +101,9 @@ namespace Lupa.Parsing
                     var nameToken = Advance();
                     return new NameExpression(nameToken);
                 default:
-                    _diagnostics.Add(DiagnosticFactory.UnexpectedToken(Current.Position, Current.Kind));
-                    throw new Exception($"Unexpected token {Current.Kind} at position {Current.Position}.");
+                    _diagnostics.Add(new Diagnostic(DiagnosticKind.Error, $"Unexpected token <{Current.Kind}>, expected a primary expression.", Current.Position));
+                    throw new Exception();
             }
         }
     }
-
-
 }
