@@ -1,7 +1,3 @@
 # Lupa
 
-Luau open-sourced (finally!) toolkit for code analysis, linting and compiling?
-
-
-Based on terrajobst's minsk dev livestreams !
-https://github.com/terrajobst/minsk/tree/master
+A basic parsing, lexing tool for Lua/Luau expressions. This project is discontinued but I decided to release it since it was actually a cool project. 
