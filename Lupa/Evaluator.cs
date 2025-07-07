@@ -17,7 +17,7 @@ namespace Lupa
             return EvaluateExpression(_root);
         }
 
-        
+
         public object EvaluateExpression(BoundExpression expression)
         {
             if (expression is BoundLiteralExpression n)
@@ -42,23 +42,23 @@ namespace Lupa
             {
                 var left = EvaluateExpression(b.Left);
                 var right = EvaluateExpression(b.Right);
-                
+
                 switch (b.Operator.Kind)
                 {
                     case BoundBinaryOperatorKind.Addition:
-                        return (double) left + (double) right;
+                        return (double)left + (double)right;
                     case BoundBinaryOperatorKind.Subtraction:
-                        return (double) left - (double) right;
+                        return (double)left - (double)right;
                     case BoundBinaryOperatorKind.Multiplication:
-                        return (double) left * (double) right;
+                        return (double)left * (double)right;
                     case BoundBinaryOperatorKind.Division:
-                        return (double) left / (double) right;
+                        return (double)left / (double)right;
                     case BoundBinaryOperatorKind.FloorDivision:
-                        return Math.Floor((double) left / (double) right);
+                        return Math.Floor((double)left / (double)right);
                     case BoundBinaryOperatorKind.Modulus:
-                        return (double) left % (double) right;
+                        return (double)left % (double)right;
                     case BoundBinaryOperatorKind.Pow:
-                        return Math.Pow((double) left, (double) right);
+                        return Math.Pow((double)left, (double)right);
                     case BoundBinaryOperatorKind.LogicalAnd:
                         return (bool)left && (bool)right;
                     case BoundBinaryOperatorKind.LogicalOr:
@@ -76,7 +76,14 @@ namespace Lupa
                     case BoundBinaryOperatorKind.LessEquals:
                         return (double)left <= (double)right;
                     case BoundBinaryOperatorKind.Concatenation:
-                        return (string)left + (string)right;
+                        return (left, right) switch
+                        {
+                            (double l, double r) => l.ToString() + r.ToString(),
+                            (string l, string r) => l + r,
+                            (double l, string r) => l.ToString() + r,
+                            (string l, double r) => l + r.ToString(),
+                            _ => throw new InvalidOperationException("Unsupported operand types for concatenation.")
+                        };
                     default:
                         throw new Exception($"Unexpected binary operator {b.Operator.Kind}");
                 }
